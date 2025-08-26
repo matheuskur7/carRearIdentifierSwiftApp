@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct CarRearIdentifierApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            TabBar()
         }
+        .modelContainer(for: CarItem.self)
     }
 }
