@@ -7,7 +7,6 @@
 
 import SwiftUI
 import PhotosUI
-import Vision
 
 struct AddCar: View {
     @Environment(\.dismiss) var dismiss
@@ -20,13 +19,16 @@ struct AddCar: View {
     @State var pickerItemImage: PhotosPickerItem?
     @State var itemImageData: Data?
     
+    @StateObject var carIdentifier = CarIdentifierModel()
+    
     var nowDate: Date = Date()
     
     var body: some View {
         NavigationStack {
-            ScrollView (showsIndicators: false){
+            ScrollView (showsIndicators: false) {
+                
                 PhotosPicker(selection: $pickerItemImage, matching: .images) {
-                    HStack{
+                    HStack {
                         if let itemImageData, let uiImage = UIImage(data: itemImageData) {
                             Image(uiImage: uiImage)
                                 .resizable()
@@ -56,12 +58,11 @@ struct AddCar: View {
                     .padding(.vertical, 10)
                 }
                 
-                VStack(spacing: 16){
+                VStack(spacing: 16) {
                     VStack(spacing: 8) {
                         Text("Modelo")
                             .font(.system(.callout, weight: .semibold))
                             .kerning(-0.31)
-                            .multilineTextAlignment(.leading)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
                         TextField("Modelo do veículo aqui", text: $model)
@@ -71,10 +72,10 @@ struct AddCar: View {
                                 RoundedRectangle(cornerRadius: 8)
                                     .foregroundStyle(.backgroundTertiary)
                             )
+                        
                         Text("Placa")
                             .font(.system(.callout, weight: .semibold))
                             .kerning(-0.31)
-                            .multilineTextAlignment(.leading)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
                         TextField("AAA 0A00...", text: $plate)
@@ -84,10 +85,9 @@ struct AddCar: View {
                                 RoundedRectangle(cornerRadius: 8)
                                     .foregroundStyle(.backgroundTertiary)
                             )
+                        
                         Text("Km Inicial")
                             .font(.system(.callout, weight: .semibold))
-                            .kerning(-0.31)
-                            .multilineTextAlignment(.leading)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
                         TextField("101.198...", text: $initialKm)
@@ -99,6 +99,7 @@ struct AddCar: View {
                             )
                     }
                     .padding()
+                    
                     Text("\(nowDate.formatted())")
                         .font(.system(.title3, weight: .regular))
                         .padding(8)
@@ -108,26 +109,18 @@ struct AddCar: View {
                                 .opacity(0.6)
                         )
                         .foregroundStyle(.white)
-                    
                 }
             }
             .background(.backgroundSecondary)
-            .frame(maxWidth: .infinity)
             .navigationTitle("Entrada de Veículo")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
+                    Button("Cancel") { dismiss() }
                 }
-                
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
-                        Task {
-                            await saveItem()
-                        }
+                        Task { await saveItem() }
                     }
                 }
             }
@@ -135,14 +128,19 @@ struct AddCar: View {
                 Button("OK", role: .cancel) {}
             }
         }
-        .onChange(of: itemImageData) { _, newValue in
-            if let data = newValue {
-                classifyImage(data: data)
-            }
-        }
         .onChange(of: pickerItemImage) {
             Task {
                 itemImageData = try? await pickerItemImage?.loadTransferable(type: Data.self)
+            }
+        }
+        .onChange(of: itemImageData) { _, newValue in
+            if let data = newValue, let uiImage = UIImage(data: data) {
+                carIdentifier.classify(image: uiImage)
+            }
+        }
+        .onReceive(carIdentifier.$identifiedModel) { identified in
+            if let identified {
+                model = identified
             }
         }
     }
@@ -152,43 +150,19 @@ struct AddCar: View {
             showAlert = true
             return
         }
-        
         guard !initialKm.isEmpty, !model.isEmpty, !plate.isEmpty else {
             showAlert = true
             return
         }
         
+        // aqui você criaria e salvaria o objeto Car, ex:
+        // let car = Car(model: model, plate: plate, km: initialKm, imageData: itemImageData, createdAt: nowDate)
+        // modelContext.insert(car)
+        
         try? modelContext.save()
         dismiss()
     }
-    
-    func classifyImage(data: Data) {
-        guard let uiImage = UIImage(data: data),
-              let cgImage = uiImage.cgImage else { return }
-        
-        do {
-            let mlModel = try CarModelIdentifierV8(configuration: MLModelConfiguration()).model
-            let vnModel = try VNCoreMLModel(for: mlModel)
-            
-            let request = VNCoreMLRequest(model: vnModel) { request, _ in
-                if let results = request.results as? [VNClassificationObservation],
-                   let best = results.first {
-                    DispatchQueue.main.async {
-                        self.model = best.identifier // aqui joga direto no campo model
-                    }
-                }
-            }
-            
-            let handler = VNImageRequestHandler(cgImage: cgImage, options: [:])
-            try handler.perform([request])
-            
-        } catch {
-            print("Erro ao rodar modelo: \(error)")
-        }
-    }
 }
-
-
 
 #Preview {
     AddCar()
