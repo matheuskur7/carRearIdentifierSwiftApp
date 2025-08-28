@@ -14,13 +14,18 @@ struct TabBar: View {
                 NavigationStack {
                     VehiclesScreen()
                         .padding(.bottom, -48)
+                        .background(.backgroundSecondary)
+                    
                 }
             }
             
             Tab("Relatórios", systemImage: "chart.bar.xaxis.ascending") {
                 NavigationStack {
                     RelatoriesScreen()
-                 }
+                        .padding(.bottom, -48)
+                        .background(.backgroundSecondary)
+                    
+                }
             }
         }
     }

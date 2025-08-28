@@ -43,6 +43,8 @@ struct VehicleCard: View {
                 VStack(spacing: 2) {
                     Text(item.modelName)
                         .font(.system(.title3, weight: .semibold))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 2)
                     
                     Text("Placa: \(item.plate)")
                         .font(.system(.caption2))
@@ -70,7 +72,7 @@ struct VehicleCard: View {
         }
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .foregroundStyle(.backgroundBlue)
+                .foregroundStyle(.appBlue.gradient)
         )
     }
 }

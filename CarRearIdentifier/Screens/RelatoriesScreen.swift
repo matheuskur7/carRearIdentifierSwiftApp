@@ -13,21 +13,31 @@ struct RelatoriesScreen: View {
     @Query var items: [CarItem]
     
     var body: some View {
-        VStack(spacing: 2) {
-            
-            Text("Entradas de Veículos p/ Modelo")
-                .font(.system(.callout))
-                .frame(maxWidth: .infinity, alignment: .leading)
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 16) {
                 
-            ChartComponent(inData: items)
+                VStack {
+                    Text("Entradas de Veículos p/ Modelo")
+                        .font(.system(.callout))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    ChartComponent(inData: items, type: "byModel")
+                }
+                VStack {
+                    Text("Entradas de Veículos p/ Dia")
+                        .font(.system(.callout))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    ChartComponent(inData: items, type: "byDay")
+                }
+                
+            }
+            .padding(.top, 8)
+            .padding(.horizontal)
+            .frame(maxHeight: .infinity)
+            .background(.backgroundSecondary)
+            .navigationTitle("Relatórios")
             
             Spacer()
         }
-        .padding(.top, 8)
-        .padding(.horizontal)
-        .frame(maxHeight: .infinity)
-        .background(.backgroundSecondary)
-        .navigationTitle("Relatórios")
     }
     
 }

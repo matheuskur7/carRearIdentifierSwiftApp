@@ -12,20 +12,18 @@ struct VerticalTwoColScroll: View {
     var items: [CarItem]
     
     var body: some View {
-        ScrollView (showsIndicators: false){
-            LazyVGrid (
-                columns: [
-                    GridItem(.flexible()), GridItem(.flexible())
-                ],
-                alignment: .trailing,
-                spacing: 8,
-                pinnedViews: [],
-                content: {
-                    ForEach (items.reversed(), id:\.self.id) { item in
-                        VehicleCard(item: item)
-                    }
-                })
-        }
+        LazyVGrid (
+            columns: [
+                GridItem(.flexible()), GridItem(.flexible())
+            ],
+            alignment: .trailing,
+            spacing: 8,
+            pinnedViews: [],
+            content: {
+                ForEach (items.reversed(), id:\.self.id) { item in
+                    VehicleCard(item: item)
+                }
+            })
     }
     
 }

@@ -15,7 +15,12 @@ struct AddCar: View {
     @State var model: String = ""
     @State var plate: String = ""
     @State var initialKm: String = ""
+    
     @State var showAlert: Bool = false
+    @State var alertTitle: String = ""
+    @State var alertMessage: String = ""
+    
+    @State var showConfirmationAlert: Bool = false
     @State var pickerItemImage: PhotosPickerItem?
     @State var itemImageData: Data?
     
@@ -81,6 +86,7 @@ struct AddCar: View {
                         TextField("AAA 0A00...", text: $plate)
                             .padding(.vertical, 12)
                             .padding(.horizontal, 16)
+                            .autocapitalization(.allCharacters)
                             .background(
                                 RoundedRectangle(cornerRadius: 8)
                                     .foregroundStyle(.backgroundTertiary)
@@ -120,12 +126,24 @@ struct AddCar: View {
                 }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
-                        Task { await saveItem() }
+                        triggerSaveConfirmation()
                     }
                 }
             }
-            .alert("Informações Faltando!", isPresented: $showAlert) {
+            // Alerta de erro genérico
+            .alert(alertTitle, isPresented: $showAlert) {
                 Button("OK", role: .cancel) {}
+            } message: {
+                Text(alertMessage)
+            }
+            // Alerta de Confirmação
+            .alert("Confirmar Dados", isPresented: $showConfirmationAlert) {
+                Button("Confirmar") {
+                    performSave()
+                }
+                Button("Cancelar", role: .cancel) {}
+            } message: {
+                Text("Por favor, confirme se os dados estão corretos:\n\nModelo: \(model)\nPlaca: \(plate)\nKm Inicial: \(initialKm)")
             }
         }
         .onChange(of: pickerItemImage) {
@@ -145,21 +163,52 @@ struct AddCar: View {
         }
     }
     
-    func saveItem() async {
-        guard let itemImageData else {
+    func isPlateValid(plate: String) -> Bool {
+        // Regex: 3 letras, um espaço, 1 dígito, 1 letra OU dígito, 2 dígitos.
+        let plateRegex = "^[A-Z]{3} \\d[A-Z0-9]\\d{2}$"
+        let platePredicate = NSPredicate(format: "SELF MATCHES %@", plateRegex)
+        return platePredicate.evaluate(with: plate)
+    }
+    
+    func triggerSaveConfirmation() {
+        guard itemImageData != nil else {
+            alertTitle = "Imagem Faltando"
+            alertMessage = "Por favor, adicione uma imagem do veículo."
             showAlert = true
             return
         }
-        guard !initialKm.isEmpty, !model.isEmpty, !plate.isEmpty else {
+        guard !model.isEmpty, !plate.isEmpty, !initialKm.isEmpty else {
+            alertTitle = "Campos Vazios"
+            alertMessage = "Por favor, preencha todos os campos antes de salvar."
+            showAlert = true
+            return
+        }
+        guard isPlateValid(plate: plate) else {
+            alertTitle = "Placa Inválida"
+            alertMessage = "O formato da placa deve ser 'AAA 0000' ou 'AAA 0A00'."
             showAlert = true
             return
         }
         
-        let carItem = CarItem(imageData: itemImageData, modelName: model, plate: plate, initialKm: Int(initialKm) ?? 0, dateTime: nowDate)
+        showConfirmationAlert = true
+    }
+    
+    func performSave() {
+        guard let finalImageData = itemImageData else { return }
+        
+        let carItem = CarItem(imageData: finalImageData, modelName: model, plate: plate, initialKm: Int(initialKm) ?? 0, dateTime: nowDate)
+        
         modelContext.insert(carItem)
         
-        try? modelContext.save()
-        dismiss()
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            print("Erro ao salvar os dados: \(error.localizedDescription)")
+            alertTitle = "Erro ao Salvar"
+            alertMessage = "Não foi possível salvar os dados. Tente novamente."
+            showAlert = true
+        }
     }
 }
 
