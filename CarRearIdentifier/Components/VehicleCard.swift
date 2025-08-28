@@ -22,6 +22,7 @@ struct VehicleCard: View {
                         RoundedRectangle(cornerRadius: 8)
                             .foregroundStyle(.backgroundBlue)
                     )
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                     .padding(8)
             } else {
                 Image(systemName: "car.fill")
@@ -34,6 +35,7 @@ struct VehicleCard: View {
                         RoundedRectangle(cornerRadius: 8)
                             .foregroundStyle(.backgroundBlue)
                     )
+                    .clipShape(RoundedRectangle(cornerRadius: 8))
                     .padding(8)
             }
             

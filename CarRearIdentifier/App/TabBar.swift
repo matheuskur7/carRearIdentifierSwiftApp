@@ -16,8 +16,11 @@ struct TabBar: View {
                         .padding(.bottom, -48)
                 }
             }
+            
             Tab("Relatórios", systemImage: "chart.bar.xaxis.ascending") {
-                
+                NavigationStack {
+                    RelatoriesScreen()
+                 }
             }
         }
     }

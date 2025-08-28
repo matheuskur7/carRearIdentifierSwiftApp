@@ -6,13 +6,15 @@
 //
 
 import SwiftUI
+import SwiftData
 
 struct VehiclesScreen: View {
     @State var addCar: Bool = false
-
+    @Query var items: [CarItem]
+    
     var body: some View {
         VStack {
-            VerticalTwoColScroll()
+            VerticalTwoColScroll(items: items)
         }
         .padding(.top, 8)
         .background(.backgroundSecondary)

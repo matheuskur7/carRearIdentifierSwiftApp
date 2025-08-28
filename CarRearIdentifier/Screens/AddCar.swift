@@ -155,9 +155,8 @@ struct AddCar: View {
             return
         }
         
-        // aqui você criaria e salvaria o objeto Car, ex:
-        // let car = Car(model: model, plate: plate, km: initialKm, imageData: itemImageData, createdAt: nowDate)
-        // modelContext.insert(car)
+        let carItem = CarItem(imageData: itemImageData, modelName: model, plate: plate, initialKm: Int(initialKm) ?? 0, dateTime: nowDate)
+        modelContext.insert(carItem)
         
         try? modelContext.save()
         dismiss()

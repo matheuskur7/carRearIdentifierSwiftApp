@@ -9,13 +9,7 @@ import SwiftUI
 
 struct VerticalTwoColScroll: View {
     
-    let items: [CarItem] = [
-        CarItem(modelName: "Peugeot 208", plate: "JBL 1B66", initialKm: 198128, dateTime: Date(timeIntervalSinceNow: -4120)),
-        CarItem(modelName: "Peugeot 208", plate: "JBL 1B66", initialKm: 198128, dateTime: Date()),
-        CarItem(modelName: "Peugeot 208", plate: "JBL 1B66", initialKm: 198128, dateTime: Date(timeIntervalSince1970: 128000000)),
-        CarItem(modelName: "Peugeot 208", plate: "JBL 1B66", initialKm: 198128, dateTime: Date(timeIntervalSince1970: 12800000000)),
-        CarItem(modelName: "Peugeot 208", plate: "JBL 1B66", initialKm: 198128, dateTime: Date())
-    ]
+    var items: [CarItem]
     
     var body: some View {
         ScrollView (showsIndicators: false){
@@ -27,7 +21,7 @@ struct VerticalTwoColScroll: View {
                 spacing: 8,
                 pinnedViews: [],
                 content: {
-                    ForEach (items, id:\.self.id) { item in
+                    ForEach (items.reversed(), id:\.self.id) { item in
                         VehicleCard(item: item)
                     }
                 })
@@ -37,5 +31,14 @@ struct VerticalTwoColScroll: View {
 }
 
 #Preview {
-    VerticalTwoColScroll()
+    VerticalTwoColScroll(
+        items:
+            [
+                CarItem(modelName: "Peugeot 208", plate: "JBL 1B66", initialKm: 198128, dateTime: Date(timeIntervalSinceNow: -4120)),
+                CarItem(modelName: "Peugeot 208", plate: "JBL 1B66", initialKm: 198128, dateTime: Date()),
+                CarItem(modelName: "Peugeot 208", plate: "JBL 1B66", initialKm: 198128, dateTime: Date(timeIntervalSince1970: 128000000)),
+                CarItem(modelName: "Peugeot 208", plate: "JBL 1B66", initialKm: 198128, dateTime: Date(timeIntervalSince1970: 12800000000)),
+                CarItem(modelName: "Peugeot 208", plate: "JBL 1B66", initialKm: 198128, dateTime: Date())
+            ]
+    )
 }

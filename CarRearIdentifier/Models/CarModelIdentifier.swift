@@ -106,7 +106,7 @@ extension UIImage {
         UIGraphicsPushContext(context)
         image.draw(in: CGRect(x: 0, y: 0, width: image.size.width, height: image.size.height))
         UIGraphicsPopContext()
-        
+
         CVPixelBufferUnlockBaseAddress(pb, [])
         return pb
     }
