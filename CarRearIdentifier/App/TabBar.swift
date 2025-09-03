@@ -13,7 +13,6 @@ struct TabBar: View {
             Tab("Veículos", systemImage: "car.fill") {
                 NavigationStack {
                     VehiclesScreen()
-                        .padding(.bottom, -48)
                         .background(.backgroundSecondary)
                     
                 }
@@ -22,7 +21,6 @@ struct TabBar: View {
             Tab("Relatórios", systemImage: "chart.bar.xaxis.ascending") {
                 NavigationStack {
                     RelatoriesScreen()
-                        .padding(.bottom, -48)
                         .background(.backgroundSecondary)
                     
                 }

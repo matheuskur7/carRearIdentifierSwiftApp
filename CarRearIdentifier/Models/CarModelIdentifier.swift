@@ -61,7 +61,7 @@ class CarIdentifierModel: ObservableObject {
 
 extension UIImage {
     func toCVPixelBuffer() -> CVPixelBuffer? {
-        let modelInputSize = CGSize(width: 360, height: 360) // ajuste p/ o tamanho de input do seu modelo
+        let modelInputSize = CGSize(width: 360, height: 360)
         
         let image = self.resize(to: modelInputSize)
         let attrs = [
